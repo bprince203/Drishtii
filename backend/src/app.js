@@ -1,5 +1,6 @@
 /**
  * Express Application Setup — Dhristi DNA Health Analyzer
+ * Production-ready configuration.
  */
 
 const express = require('express');
@@ -14,17 +15,28 @@ const recommendationRoutes = require('./routes/recommendation.routes');
 
 const app = express();
 
+// Trust Render/Vercel proxy
+app.set('trust proxy', 1);
+
 // Security headers
 app.use(helmet());
 
-// CORS
+// CORS — allow the configured origin (or all origins if not set)
+const allowedOrigins = ENV.CORS_ORIGIN
+  ? ENV.CORS_ORIGIN.split(',').map((o) => o.trim())
+  : true; // Allow all if not configured
+
 app.use(
   cors({
-    origin: ENV.CORS_ORIGIN,
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type'],
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: false,
   })
 );
+
+// Handle preflight
+app.options('*', cors());
 
 // Rate limiting
 app.use(
@@ -45,7 +57,7 @@ app.use(
   })
 );
 
-// Logging
+// Logging (plain JSON — works in production without pino-pretty)
 app.use(
   pinoHttp({
     level: ENV.NODE_ENV === 'production' ? 'info' : 'debug',
@@ -53,7 +65,7 @@ app.use(
 );
 
 // Body parsers
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 
 // Health check
 app.get('/api/health', (_req, res) => {
@@ -63,6 +75,11 @@ app.get('/api/health', (_req, res) => {
 // Routes
 app.use('/api', analyzeRoutes);
 app.use('/api', recommendationRoutes);
+
+// 404 catch-all
+app.use((_req, res) => {
+  res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Route not found.' } });
+});
 
 // Error handler (must be last)
 app.use(errorHandler);
