@@ -1,6 +1,6 @@
 /**
  * Express Application Setup — Dhristi DNA Health Analyzer
- * Production-ready configuration.
+ * Production-ready: CORS open, trust proxy, preflight, logging, error handling.
  */
 
 const express = require('express');
@@ -15,30 +15,50 @@ const recommendationRoutes = require('./routes/recommendation.routes');
 
 const app = express();
 
-// Trust Render/Vercel proxy
+// Trust proxy (required for Render + rate limiting behind proxy)
 app.set('trust proxy', 1);
 
-// Security headers
-app.use(helmet());
+// ── CORS ──────────────────────────────────────────────────────────────
+// Allow any origin in development; in production restrict to CORS_ORIGIN.
+// If CORS_ORIGIN contains multiple URLs, separate with comma in env var.
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow server-to-server / curl / Postman (no origin header)
+    if (!origin) return callback(null, true);
 
-// CORS — allow the configured origin (or all origins if not set)
-const allowedOrigins = ENV.CORS_ORIGIN
-  ? ENV.CORS_ORIGIN.split(',').map((o) => o.trim())
-  : true; // Allow all if not configured
+    // In development, allow everything
+    if (ENV.NODE_ENV !== 'production') return callback(null, true);
 
+    // In production, match against list
+    const allowed = ENV.CORS_ORIGIN
+      ? ENV.CORS_ORIGIN.split(',').map((o) => o.trim())
+      : [];
+
+    if (allowed.length === 0 || allowed.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS policy: origin ${origin} not allowed`));
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
+  credentials: false,
+  optionsSuccessStatus: 200, // For legacy browser compat
+};
+
+// Handle OPTIONS preflight BEFORE anything else
+app.options('*', cors(corsOptions));
+app.use(cors(corsOptions));
+
+// ── Security headers ──────────────────────────────────────────────────
+// Relax CSP for API server (no HTML pages served)
 app.use(
-  cors({
-    origin: allowedOrigins,
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: false,
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
   })
 );
 
-// Handle preflight
-app.options('*', cors());
-
-// Rate limiting
+// ── Rate limiting ─────────────────────────────────────────────────────
 app.use(
   '/api/',
   rateLimit({
@@ -49,39 +69,32 @@ app.use(
     message: {
       success: false,
       product: 'Dhristi',
-      error: {
-        code: 'RATE_LIMIT_EXCEEDED',
-        message: 'Too many requests. Please try again later.',
-      },
+      error: { code: 'RATE_LIMIT_EXCEEDED', message: 'Too many requests. Please try again later.' },
     },
   })
 );
 
-// Logging (plain JSON — works in production without pino-pretty)
-app.use(
-  pinoHttp({
-    level: ENV.NODE_ENV === 'production' ? 'info' : 'debug',
-  })
-);
+// ── Logging ───────────────────────────────────────────────────────────
+app.use(pinoHttp({ level: ENV.NODE_ENV === 'production' ? 'info' : 'debug' }));
 
-// Body parsers
+// ── Body parsers ──────────────────────────────────────────────────────
 app.use(express.json({ limit: '1mb' }));
 
-// Health check
+// ── Health check ──────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', product: 'Dhristi', timestamp: new Date().toISOString() });
 });
 
-// Routes
+// ── Routes ────────────────────────────────────────────────────────────
 app.use('/api', analyzeRoutes);
 app.use('/api', recommendationRoutes);
 
-// 404 catch-all
+// ── 404 ──────────────────────────────────────────────────────────────
 app.use((_req, res) => {
   res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Route not found.' } });
 });
 
-// Error handler (must be last)
+// ── Error handler (must be last) ──────────────────────────────────────
 app.use(errorHandler);
 
 module.exports = app;

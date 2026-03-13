@@ -2,20 +2,8 @@
   "framework": "vite",
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
-  "installCommand": "echo skip-root-install",
+  "installCommand": "echo 'no root install'",
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "https://YOUR_RENDER_BACKEND_URL.onrender.com/api/$1"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" }
-      ]
-    }
+    { "source": "/((?!api).*)", "destination": "/index.html" }
   ]
 }
