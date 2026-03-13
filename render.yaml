@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: dhristi-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: CORS_ORIGIN
+        sync: false   # Set this to your Vercel frontend URL in Render dashboard
+      - key: MAX_FILE_SIZE_MB
+        value: 50
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 60000
+      - key: RATE_LIMIT_MAX
+        value: 20
+      - key: GROQ_API_KEY
+        sync: false   # Set in Render dashboard — do not commit real keys

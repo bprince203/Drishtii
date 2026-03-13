@@ -49,10 +49,6 @@ app.use(
 app.use(
   pinoHttp({
     level: ENV.NODE_ENV === 'production' ? 'info' : 'debug',
-    transport:
-      ENV.NODE_ENV !== 'production'
-        ? { target: 'pino-pretty', options: { colorize: true } }
-        : undefined,
   })
 );
 

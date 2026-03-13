@@ -1,32 +1,27 @@
 {
   "name": "dhristi-backend",
   "version": "1.0.0",
-  "description": "Dhristi — DNA Health Analyzer backend. Parses 23andMe genome data and returns health-related genetic predisposition insights.",
+  "description": "Dhristi — DNA Health Analyzer backend",
   "main": "src/server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js"
   },
-  "keywords": [
-    "genomics",
-    "health",
-    "dna",
-    "snp",
-    "predisposition"
-  ],
+  "keywords": ["genomics", "health", "dna", "snp", "predisposition"],
   "license": "MIT",
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
     "adm-zip": "^0.5.16",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "express": "^5.1.0",
+    "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "groq-sdk": "^1.1.1",
-    "helmet": "^8.1.0",
+    "helmet": "^8.0.0",
     "multer": "^1.4.5-lts.2",
     "pino-http": "^10.4.0",
-    "pino-pretty": "^13.0.0",
     "uuid": "^11.1.0",
     "zod": "^3.24.2"
   }
