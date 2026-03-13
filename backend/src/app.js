@@ -19,30 +19,12 @@ const app = express();
 app.set('trust proxy', 1);
 
 // ── CORS ──────────────────────────────────────────────────────────────
-// Allow any origin in development; in production restrict to CORS_ORIGIN.
-// If CORS_ORIGIN contains multiple URLs, separate with comma in env var.
+// Public API — allow all origins. No credentials/cookies are used.
 const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow server-to-server / curl / Postman (no origin header)
-    if (!origin) return callback(null, true);
-
-    // In development, allow everything
-    if (ENV.NODE_ENV !== 'production') return callback(null, true);
-
-    // In production, match against list
-    const allowed = ENV.CORS_ORIGIN
-      ? ENV.CORS_ORIGIN.split(',').map((o) => o.trim())
-      : [];
-
-    if (allowed.length === 0 || allowed.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error(`CORS policy: origin ${origin} not allowed`));
-  },
+  origin: '*',
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Accept'],
   credentials: false,
-  optionsSuccessStatus: 200, // For legacy browser compat
 };
 
 // Handle OPTIONS preflight BEFORE anything else
