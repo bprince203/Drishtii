@@ -1,9 +1,11 @@
 /**
  * Recommendation API service — Dhristi
- * Calls the backend to generate AI-powered recommendations.
+ * In production calls Render backend directly via VITE_API_URL.
  */
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api';
 
 /**
  * Fetch AI-generated recommendations based on analysis results.
@@ -12,7 +14,7 @@ const API_BASE = '/api';
  */
 export async function fetchRecommendations({ analysisId, results }) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 60000); // 60s timeout
+  const timeout = setTimeout(() => controller.abort(), 90000); // 90s for cold starts
 
   try {
     const response = await fetch(`${API_BASE}/recommendations`, {
@@ -41,7 +43,7 @@ export async function fetchRecommendations({ analysisId, results }) {
     return await response.json();
   } catch (err) {
     if (err.name === 'AbortError') {
-      throw new Error('Request timed out. Please try again.');
+      throw new Error('Request timed out. The server may be waking up — please try again in 30 seconds.');
     }
     throw err;
   } finally {

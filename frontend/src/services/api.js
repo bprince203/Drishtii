@@ -1,4 +1,9 @@
-const API_BASE = '/api';
+// In production, calls go directly to the Render backend.
+// Set VITE_API_URL in Vercel project settings to: https://drishtii-746h.onrender.com
+// In development the Vite proxy handles /api -> localhost:3001
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api';
 
 /**
  * Uploads a genome file and returns analysis results.
@@ -39,10 +44,10 @@ export async function analyzeGenomeFile(file, onProgress) {
     });
 
     xhr.addEventListener('timeout', () => {
-      reject(new Error('Request timed out. The file may be too large or the server is busy.'));
+      reject(new Error('Request timed out. The file may be too large or the server is slow to start (free tier may need ~30s to wake up).'));
     });
 
-    xhr.timeout = 60000;
+    xhr.timeout = 90000; // 90s — allow time for Render free tier cold start
     xhr.send(formData);
   });
 }
