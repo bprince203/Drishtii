@@ -1,5 +1,5 @@
 /**
- * Express Application Setup — Dhristi DNA Health Analyzer
+ * Express Application Setup — Prajnaa AI Health Platform
  * Production-ready: CORS open, trust proxy, preflight, logging, error handling.
  */
 
@@ -12,6 +12,8 @@ const { ENV } = require('./config/env');
 const { errorHandler } = require('./middleware/errorHandler');
 const analyzeRoutes = require('./routes/analyze.routes');
 const recommendationRoutes = require('./routes/recommendation.routes');
+const healthRoutes = require('./routes/health.routes');
+const bloodBankRoutes = require('./routes/bloodBank.routes');
 
 const app = express();
 
@@ -50,7 +52,7 @@ app.use(
     legacyHeaders: false,
     message: {
       success: false,
-      product: 'Dhristi',
+      product: 'Prajnaa',
       error: { code: 'RATE_LIMIT_EXCEEDED', message: 'Too many requests. Please try again later.' },
     },
   })
@@ -64,12 +66,14 @@ app.use(express.json({ limit: '1mb' }));
 
 // ── Health check ──────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', product: 'Dhristi', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', product: 'Prajnaa', timestamp: new Date().toISOString() });
 });
 
 // ── Routes ────────────────────────────────────────────────────────────
 app.use('/api', analyzeRoutes);
 app.use('/api', recommendationRoutes);
+app.use('/api/health', healthRoutes);
+app.use('/api/blood-bank', bloodBankRoutes);
 
 // ── 404 ──────────────────────────────────────────────────────────────
 app.use((_req, res) => {

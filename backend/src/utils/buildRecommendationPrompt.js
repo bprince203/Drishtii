@@ -17,7 +17,7 @@ function buildRecommendationPrompt(results) {
       .join('\n');
   });
 
-  const prompt = `You are a health wellness advisor AI for a product called "Dhristi — DNA Health Analyzer".
+  const prompt = `You are a health wellness advisor AI for a product called "Prajnaa — AI Health Platform".
 
 The user has received the following genetic predisposition analysis results. These results are based on selected SNP markers only and are NOT a clinical diagnosis.
 

@@ -10,14 +10,22 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js"
   },
-  "keywords": ["genomics", "health", "dna", "snp", "predisposition"],
+  "keywords": [
+    "genomics",
+    "health",
+    "dna",
+    "snp",
+    "predisposition"
+  ],
   "license": "MIT",
   "dependencies": {
     "adm-zip": "^0.5.16",
+    "axios": "^1.13.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
+    "form-data": "^4.0.5",
     "groq-sdk": "^1.1.1",
     "helmet": "^8.0.0",
     "multer": "^1.4.5-lts.2",

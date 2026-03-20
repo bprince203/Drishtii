@@ -1,5 +1,5 @@
 /**
- * Recommendation Controller — Dhristi DNA Health Analyzer
+ * Recommendation Controller — Prajnaa DNA Health Analyzer
  */
 
 const { v4: uuidv4 } = require('uuid');
@@ -50,7 +50,7 @@ async function getRecommendations(req, res, next) {
 
     res.json({
       success: true,
-      product: 'Dhristi',
+      product: 'Prajnaa',
       recommendationId: `rec_${uuidv4().slice(0, 12)}`,
       generatedAt: new Date().toISOString(),
       disclaimer: AI_DISCLAIMER,

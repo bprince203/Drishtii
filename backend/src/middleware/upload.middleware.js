@@ -1,5 +1,5 @@
 /**
- * Upload Middleware — Dhristi DNA Health Analyzer
+ * Upload Middleware — Prajnaa DNA Health Analyzer
  * Configures multer for genome file uploads with validation.
  * Supports up to 50MB files with disk storage for memory safety.
  */

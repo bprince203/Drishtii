@@ -1,5 +1,5 @@
 /**
- * Trait Engine Service — Dhristi DNA Health Analyzer
+ * Trait Engine Service — Prajnaa DNA Health Analyzer
  * Evaluates parsed SNP data against trait rules to produce health predisposition insights.
  * Pure functions — no side effects, fully testable.
  */

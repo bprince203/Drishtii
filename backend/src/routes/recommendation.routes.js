@@ -1,5 +1,5 @@
 /**
- * Recommendation Routes — Dhristi DNA Health Analyzer
+ * Recommendation Routes — Prajnaa DNA Health Analyzer
  */
 
 const { Router } = require('express');

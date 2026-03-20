@@ -1,5 +1,5 @@
 /**
- * Groq Recommendation Service — Dhristi DNA Health Analyzer
+ * Groq Recommendation Service — Prajnaa DNA Health Analyzer
  * Server-side only. API key is read from environment variables only.
  * Uses Groq Cloud (llama-3.3-70b-versatile) for fast, reliable inference.
  */

@@ -1,5 +1,5 @@
 /**
- * Analyze Controller — Dhristi DNA Health Analyzer
+ * Analyze Controller — Prajnaa DNA Health Analyzer
  * Handles the genome analysis request lifecycle:
  * 1. Receive uploaded file
  * 2. Extract if zip
@@ -86,7 +86,7 @@ async function analyzeGenome(req, res, next) {
     // Build response
     const response = {
       success: true,
-      product: 'Dhristi',
+      product: 'Prajnaa',
       analysisId: uuidv4(),
       uploadedAt: new Date().toISOString(),
       meta: {

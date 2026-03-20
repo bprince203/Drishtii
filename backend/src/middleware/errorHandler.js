@@ -1,5 +1,5 @@
 /**
- * Central Error Handler — Dhristi DNA Health Analyzer
+ * Central Error Handler — Prajnaa DNA Health Analyzer
  * Consistent JSON error responses for all error types.
  */
 
@@ -35,7 +35,7 @@ function errorHandler(err, _req, res, _next) {
 
   res.status(statusCode).json({
     success: false,
-    product: 'Dhristi',
+    product: 'Prajnaa',
     error: {
       code,
       message,

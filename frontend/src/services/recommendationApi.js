@@ -1,5 +1,5 @@
 /**
- * Recommendation API service — Dhristi
+ * Recommendation API service — Prajnaa
  * In production calls Render backend directly via VITE_API_URL.
  */
 
