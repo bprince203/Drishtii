@@ -1,0 +1,87 @@
+// Prisma Schema — Prajnaa Blood Bank Feature
+// After defining schema, run:
+//   npx prisma migrate dev --name init_bloodbank
+//   npx prisma generate
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Donor {
+  id            String              @id @default(cuid())
+  clerkUserId   String              @unique
+  name          String
+  email         String              @unique
+  phone         String              @unique // E.164 format e.g. +919876543210
+  whatsapp      String?                     // optional separate WhatsApp number
+  bloodGroup    BloodGroup
+  city          String
+  state         String
+  isAvailable   Boolean             @default(true)
+  lastDonatedAt DateTime?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  notifications DonorNotification[]
+}
+
+model EmergencyRequest {
+  id            String              @id @default(cuid())
+  requestedBy   String                      // Clerk user ID of requester
+  bloodGroup    BloodGroup
+  city          String
+  state         String
+  hospitalName  String
+  contactPhone  String
+  urgencyLevel  UrgencyLevel        @default(HIGH)
+  message       String?
+  status        RequestStatus       @default(OPEN)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  notifications DonorNotification[]
+}
+
+model DonorNotification {
+  id        String           @id @default(cuid())
+  donorId   String
+  requestId String
+  channels  String[]         // ["sms", "whatsapp", "email"]
+  status    NotifStatus      @default(SENT)
+  sentAt    DateTime         @default(now())
+  donor     Donor            @relation(fields: [donorId], references: [id])
+  request   EmergencyRequest @relation(fields: [requestId], references: [id])
+}
+
+enum BloodGroup {
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  O_POS
+  O_NEG
+}
+
+enum UrgencyLevel {
+  CRITICAL
+  HIGH
+  MEDIUM
+}
+
+enum RequestStatus {
+  OPEN
+  FULFILLED
+  CANCELLED
+}
+
+enum NotifStatus {
+  SENT
+  FAILED
+  PENDING
+}

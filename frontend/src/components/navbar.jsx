@@ -1,15 +1,17 @@
 /**
- * Navbar — Prajnaa. Modern glass with gradient accent.
+ * Navbar — Prajnaa. Modern glass with gradient accent + Clerk auth.
  */
 import { motion } from 'motion/react';
 import { NavLink, Link } from 'react-router-dom';
-import { Dna, FileText, Droplets } from 'lucide-react';
+import { Dna, FileText, Droplets, UserCircle } from 'lucide-react';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 
 const NAV_LINKS = [
   { to: '/health-twin', label: 'Health Twin', icon: Dna },
   { to: '/report-analyzer', label: 'Report Analyzer', icon: FileText },
-  { to: '/blood-bank', label: 'Blood Bank', icon: Droplets },
 ];
+
+const BLOOD_BANK_URL = 'https://praajna.vercel.app/';
 
 export function Navbar() {
   return (
@@ -34,10 +36,9 @@ export function Navbar() {
                 key={to}
                 to={to}
                 className={({ isActive }) =>
-                  `hidden sm:flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 ${
-                    isActive
-                      ? 'bg-slate-900 text-white shadow-md'
-                      : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                  `hidden sm:flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 ${isActive
+                    ? 'bg-slate-900 text-white shadow-md'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                   }`
                 }
               >
@@ -45,6 +46,32 @@ export function Navbar() {
                 {label}
               </NavLink>
             ))}
+
+            {/* Blood Bank — external link */}
+            <a
+              href={BLOOD_BANK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-xl transition-all duration-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+            >
+              <Droplets className="h-3.5 w-3.5" />
+              Blood Bank
+            </a>
+
+            {/* Clerk Auth Buttons */}
+            <div className="ml-2 hidden sm:block">
+              <SignedIn>
+                <UserButton afterSignOutUrl="/" />
+              </SignedIn>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-xl transition-all">
+                    <UserCircle className="h-3.5 w-3.5" />
+                    Sign In
+                  </button>
+                </SignInButton>
+              </SignedOut>
+            </div>
           </div>
         </div>
       </div>

@@ -1,0 +1,67 @@
+# ── Environment & Secrets ─────────────────────────────────────────────
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*.local
+
+# ── Node / NPM ────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-error.log
+yarn-debug.log
+.npm
+.pnp*
+.yarn-integrity
+
+# ── Build outputs ─────────────────────────────────────────────────────
+dist/
+build/
+.output/
+
+# ── Vite ──────────────────────────────────────────────────────────────
+*.local
+
+# ── Python ────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+.venv/
+*.egg-info/
+dist/
+.eggs/
+
+# ── Python virtual environments ───────────────────────────────────────
+ai-service/env/
+ai-service/.venv/
+
+# ── OS ────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE ───────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Logs ──────────────────────────────────────────────────────────────
+logs/
+*.log
+pino-*.log
+
+# ── Uploads / temp ────────────────────────────────────────────────────
+uploads/
+tmp/
+temp/
+
+# ── Prisma ────────────────────────────────────────────────────────────
+backend/prisma/migrations/

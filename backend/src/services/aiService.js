@@ -42,7 +42,8 @@ async function analyzeReport(fileBuffer, originalName, mimeType) {
     err.code = 'AI_SERVICE_ERROR';
     throw err;
   } catch (axiosErr) {
-    if (!axiosErr.statusCode) {
+    // Network error — service is genuinely unreachable
+    if (axiosErr.code === 'ECONNREFUSED' || axiosErr.code === 'ENOTFOUND' || axiosErr.code === 'ECONNABORTED') {
       const err = new Error('AI service is temporarily unavailable. Please try again later.');
       err.statusCode = 503;
       err.code = 'AI_SERVICE_UNAVAILABLE';

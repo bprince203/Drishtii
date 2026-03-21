@@ -1,44 +1,49 @@
 /**
- * Central Error Handler — Prajnaa DNA Health Analyzer
- * Consistent JSON error responses for all error types.
+ * Error Handler Middleware — Prajnaa AI Health Platform
+ * Catches unhandled errors and returns structured JSON responses.
  */
+const { ENV } = require('../config/env');
 
 function errorHandler(err, _req, res, _next) {
-  // Determine status code
-  let statusCode = err.statusCode || err.status || 500;
-  let code = 'INTERNAL_ERROR';
-  let message = err.message || 'An internal server error occurred.';
+  console.error(`[ERROR] ${err.name || 'Error'}: ${err.message}`);
+  if (ENV.NODE_ENV !== 'production') console.error(err.stack);
 
-  // Handle Multer-specific errors
-  if (err.code === 'LIMIT_FILE_SIZE') {
-    statusCode = 413;
-    code = 'FILE_TOO_LARGE';
-    message = 'File too large. Maximum upload size is 50 MB.';
-  } else if (err.code === 'LIMIT_FILE_COUNT') {
-    statusCode = 400;
-    code = 'TOO_MANY_FILES';
-    message = 'Only one file can be uploaded at a time.';
-  } else if (err.code === 'LIMIT_UNEXPECTED_FILE') {
-    statusCode = 400;
-    code = 'INVALID_FIELD';
-    message = 'File must be uploaded using the "genomeFile" field.';
-  } else if (statusCode === 400) {
-    code = 'BAD_REQUEST';
-  } else if (statusCode === 413) {
-    code = 'FILE_TOO_LARGE';
+  // ── Validation Errors (Zod or custom) ────────────────────────────
+  if (err.name === 'ZodError') {
+    return res.status(400).json({
+      error: { code: 'VALIDATION_ERROR', message: 'Invalid request data.', details: err.errors || err.issues },
+    });
   }
 
-  // Never expose internal errors in production
-  if (statusCode === 500 && process.env.NODE_ENV === 'production') {
-    message = 'An internal server error occurred. Please try again later.';
+  if (err.name === 'ValidationError' || err.statusCode === 400) {
+    return res.status(400).json({
+      error: { code: 'VALIDATION_ERROR', message: err.message || 'Invalid request data.' },
+    });
   }
 
-  res.status(statusCode).json({
+  // ── Auth Errors ──────────────────────────────────────────────────
+  if (err.status === 401 || err.statusCode === 401) {
+    return res.status(401).json({
+      error: { code: 'UNAUTHORIZED', message: 'Authentication required.' },
+    });
+  }
+
+  // ── Custom status code ───────────────────────────────────────────
+  const statusCode = err.statusCode || err.status || 500;
+  if (statusCode !== 500) {
+    return res.status(statusCode).json({
+      error: { code: err.code || 'REQUEST_ERROR', message: err.message },
+    });
+  }
+
+  // ── Generic 500 ─────────────────────────────────────────────────
+  res.status(500).json({
     success: false,
-    product: 'Prajnaa',
     error: {
-      code,
-      message,
+      code: 'INTERNAL_ERROR',
+      message: ENV.NODE_ENV === 'production'
+        ? 'An unexpected error occurred. Please try again later.'
+        : err.message,
     },
   });
 }

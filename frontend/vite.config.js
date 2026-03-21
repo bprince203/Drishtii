@@ -10,6 +10,18 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          clerk: ['@clerk/clerk-react'],
+          motion: ['motion'],
+          ui: ['lucide-react', '@radix-ui/react-accordion', '@radix-ui/react-slot'],
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
     proxy: {

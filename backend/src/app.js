@@ -1,6 +1,7 @@
 /**
  * Express Application Setup — Prajnaa AI Health Platform
- * Production-ready: CORS open, trust proxy, preflight, logging, error handling.
+ * Production-ready: CORS, Clerk auth, logging, error handling.
+ * Uses in-memory dummy data for blood bank features (no Prisma dependency).
  */
 
 const express = require('express');
@@ -14,6 +15,8 @@ const analyzeRoutes = require('./routes/analyze.routes');
 const recommendationRoutes = require('./routes/recommendation.routes');
 const healthRoutes = require('./routes/health.routes');
 const bloodBankRoutes = require('./routes/bloodBank.routes');
+const donorRoutes = require('./routes/donor.routes');
+const bloodbankProxyRoutes = require('./routes/bloodbankProxy.routes');
 
 const app = express();
 
@@ -21,26 +24,39 @@ const app = express();
 app.set('trust proxy', 1);
 
 // ── CORS ──────────────────────────────────────────────────────────────
-// Public API — allow all origins. No credentials/cookies are used.
+const allowedOrigins = process.env.FRONTEND_URL
+  ? [process.env.FRONTEND_URL, 'http://localhost:5173']
+  : '*';
+
 const corsOptions = {
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Accept'],
-  credentials: false,
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
+  credentials: true,
 };
 
-// Handle OPTIONS preflight BEFORE anything else
 app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
 
 // ── Security headers ──────────────────────────────────────────────────
-// Relax CSP for API server (no HTML pages served)
 app.use(
   helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
   })
 );
+
+// ── Clerk middleware (global — parses auth from all requests) ──────────
+// Only activate if CLERK_SECRET_KEY is set (graceful degradation)
+if (ENV.CLERK_SECRET_KEY) {
+  try {
+    const { clerkAuth } = require('./middleware/requireAuth');
+    app.use(clerkAuth);
+    console.log('✅ Clerk authentication middleware loaded.');
+  } catch (err) {
+    console.warn('⚠️  Failed to load Clerk middleware:', err.message);
+  }
+}
 
 // ── Rate limiting ─────────────────────────────────────────────────────
 app.use(
@@ -63,6 +79,7 @@ app.use(pinoHttp({ level: ENV.NODE_ENV === 'production' ? 'info' : 'debug' }));
 
 // ── Body parsers ──────────────────────────────────────────────────────
 app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true }));
 
 // ── Health check ──────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
@@ -70,10 +87,17 @@ app.get('/api/health', (_req, res) => {
 });
 
 // ── Routes ────────────────────────────────────────────────────────────
+// Existing features
 app.use('/api', analyzeRoutes);
 app.use('/api', recommendationRoutes);
 app.use('/api/health', healthRoutes);
-app.use('/api/blood-bank', bloodBankRoutes);
+app.use('/api/blood-bank', bloodBankRoutes);           // Legacy static locator
+
+// Blood Bank — Donor Registry (auth required — handled inside routes)
+app.use('/api/bloodbank', donorRoutes);
+
+// Blood Bank — Locator with dummy data (public — no auth)
+app.use('/api/bloodbank/locator', bloodbankProxyRoutes);
 
 // ── 404 ──────────────────────────────────────────────────────────────
 app.use((_req, res) => {

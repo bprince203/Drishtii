@@ -1,21 +1,73 @@
 services:
+  # ── Node.js Backend ──────────────────────────────────────
   - type: web
-    name: dhristi-backend
+    name: prajnaa-backend
     runtime: node
+    region: singapore
     rootDir: backend
-    buildCommand: npm install --omit=dev
+    buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: CORS_ORIGIN
-        value: https://drishtii.vercel.app  # replace with your Vercel URL
+      - key: PORT
+        value: 5000
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: AI_SERVICE_BASE_URL
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+      - key: TWILIO_WHATSAPP_NUMBER
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: EXTERNAL_BLOODBANK_API_URL
+        sync: false
+      - key: EXTERNAL_BLOODBANK_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
       - key: MAX_FILE_SIZE_MB
         value: 50
       - key: RATE_LIMIT_WINDOW_MS
         value: 60000
       - key: RATE_LIMIT_MAX
-        value: 20
-      - key: GROQ_API_KEY
+        value: 30
+
+  # ── Vite/React Frontend (Static Site) ─────────────────────
+  - type: web
+    name: prajnaa-frontend
+    runtime: static
+    region: singapore
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: VITE_API_URL
         sync: false
