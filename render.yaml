@@ -2,11 +2,11 @@ services:
   # ── Node.js Backend ──────────────────────────────────────
   - type: web
     name: prajnaa-backend
-    runtime: node
+    runtime: docker
     region: singapore
     rootDir: backend
-    buildCommand: npm install
-    startCommand: npm start
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
@@ -38,11 +38,11 @@ services:
   # ── Python FastAPI AI Service ──────────────────────────────
   - type: web
     name: prajnaa-ai-service
-    runtime: python
+    runtime: docker
     region: singapore
     rootDir: ai-service
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    dockerfilePath: ./ai-service/Dockerfile
+    dockerContext: ./ai-service
     healthCheckPath: /health
     envVars:
       - key: GROQ_API_KEY
